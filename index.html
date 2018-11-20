@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>My Test PROJECT</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <style>
+        .delete_ico {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+
+        }
+        .delete_ico:hover {
+            color: 990000;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+<br /><br />
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Test Project</h3>
+        </div>
+    </div><!-- end of row -->
+    <div class="row">
+        <div class="col-md-6">
+            <form id="form1" action="">
+
+                <div class="form-group">
+                    <label for="taskData">Название напоминания</label>
+                    <input type="text" class="form-control" id="taskData" aria-describedby="taskDataHelp" placeholder="Занятие">
+                    <small id="taskDataHelp" class="form-text text-muted">Введите название занятия на завтра.</small>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="reminderData">Когда напомнить</label>
+                    <div class="row">
+                        <div class="col-md-11">
+                            <input type="text" class="form-control" id="reminderData" aria-describedby="reminderDataHelp" placeholder="Напомнить">
+                            <small id="reminderDataHelp" class="form-text text-muted">Введите дату и время напоминания.</small>
+                        </div>
+                        <div class="col-xs-1">
+                            <a href="#" class="btn btn-light"><i class="fa fa-calendar"></i></a>
+                        </div>
+                    </div>
+                </div> <!-- end of form-group-->
+
+
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="Check1" value="some data">
+                    <label class="form-check-label" for="exampleCheck1">Важно</label>
+                </div>
+
+                <button type="button" class="btn btn-primary" onclick="insertItemToList()" >Add task</button>
+                <button type="button" class="btn btn-light" onclick="emptyAllList()">Clear Form</button>
+                <!--button type="reset" class="btn btn-dark">Reset</button -->
+
+            </form>
+        </div><!-- end of col-md-6 -->
+        <div class="col-md-6">
+            <div class="card" style="width: 100%;">
+                <div class="card-body">
+                    <h4 class="card-title">Список дел на ближайшее время:</h4>
+                    <!-- p class="card-text">Завтра: <span id="tomDate"></span>.</p-->
+                    <ul class="list-group" id="task_list">
+                    </ul>
+                    <br />
+                    <a href="#" onclick="handleClearAll()" class="btn btn-primary">Clear List</a>
+                </div>
+            </div>
+        </div><!-- end of col-md-6 -->
+    </div> <!-- end of row -->
+</div>
+<script type="text/javascript" src="js/tasks.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        initTaskContainer();
+    });
+
+    /*
+    document.addEventListener("DOMContentLoaded", function() {
+      coreInsertLiToList({task: "На сегодня нет активных задач"});
+    });
+
+    function clearForm() {
+        document.getElementById('form1').reset();
+    }
+
+
+    function emptyAllList(){
+      // document.getElementById('task_list').innerHTML = ''; // все содержимое контейнера task_list будет удалено
+      // т.е. удалятся все узлы-детишки у тега UL (c id = task_list)
+      var list = document.getElementById('task_list'); // получить доступ к UL
+      while(list.firstChild) { // выполнять цикл до тех пор пока что-то есть по ссылке "первый ребенок" (firstChild)
+        list.removeChild(list.firstChild); // удалить из списка ребенка - переданный в качесве параметра
+      }
+    }
+
+
+    function getDataFromForm() {
+      var res = {};
+      var task = document.getElementById('taskData').value;
+      task = task.trim();
+      var reminder = document.getElementById('reminderData').value;
+      reminder = task.trim();
+      var check = document.getElementById('Check1').checked;
+      // document.getElementById('Check1').value;
+      res = { task, reminder, check };
+      return res;
+    }
+
+    function go() {
+      var data = getDataFromForm('form1');
+      var res = insertDataToList(data);
+      if (res === -1) {
+        alert('Пожалуйста заполните все обязательные поля.');
+        return false;
+      }
+      clearForm();
+      return true;
+    }
+
+    function deleteNode(event) {
+      var tmp = event.target;
+      var nodeToDelete = tmp.parentNode.parentNode;
+      nodeToDelete.remove();
+      var list = document.getElementById('task_list').childNodes; // получить доступ коллекции детей
+      if(!list.length) {
+      coreInsertLiToList({task: "На сегодня нет активных задач"});
+      }
+    }
+
+    function insertDataToList(data) {
+      if (!data.task.length || !data.reminder.length) {
+        return -1;
+      }
+      coreInsertLiToList(data, true);
+    }
+
+    function findEmptyItemInList() { // возвращает true/false в зависимости от того есть ли там пустой item
+      var list = document.getElementById('task_list').childNodes; // получить доступ коллекции детей
+      for(var i=0; i < list.length; i++ ) {
+        if(typeof list[i].getAttribute === "function" && list[i].getAttribute("data-type") == "empty") {
+          return list[i];
+        }
+      }
+      return null;
+    }
+
+    function coreInsertLiToList(data, task = false) {
+
+      var list = document.getElementById('task_list');
+      var newListNode = document.createElement('li');
+      newListNode.classList.add('list-group-item');
+      var emptyItem = findEmptyItemInList();
+      if( emptyItem !== null) {
+        emptyAllList();
+      }
+
+      if (task) {
+        newListNode.innerHTML = (data.check ? '<i class="text-danger fa fa-exclamation-triangle"></i> &nbsp ' : '') +
+          data.task + '<br /><span class="text-muted"><small>' +
+          data.reminder + '</small></span> ' +
+          '<span class="delete_ico" onclick="deleteNode(event)"><i class="fa fa-times"></i></span>';
+          newListNode.setAttribute('data-type', 'task');
+      }
+      else {
+        newListNode.innerHTML = data.task;
+        newListNode.setAttribute('data-type', 'empty');
+      }
+      list.appendChild(newListNode);
+    }
+
+    function echo(val) {
+    // объявили функцию, которая добавляет val в html документ (тег с id=main_content)
+     var ob = document.getElementById('main_content');
+     ob.innerHTML = val;
+    }
+
+    var obj1 = {item: 5, color: 6};
+
+    console.log('items = ', 5 + 10) // => 15
+    */
+</script>
+</body>
+
+</html>
